@@ -1,18 +1,40 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="hello">
+    <input id="inputArea" type="text">
+    <button @click="sendMsgToServer">发送消息给服务端</button>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-
+import io from 'socket.io-client'
+const socket = io('http://127.0.0.1:24000')
 export default {
-  name: 'HomeView',
-  components: {
-    HelloWorld
+  name: 'HelloWorld',
+  data () {
+    return {
+      msg: 'Welcome to Your Vue.js App'
+    }
+  },
+  methods: {
+    /* socket.emit('hello','xxx') 表示，服务端上定义了一个监听'hello'的socket，
+      即服务端有代码
+      socket.on('hello',(data) => {
+        //这是接收到的客户端消息
+        console.log(data)
+      })
+       */
+    sendMsgToServer () {
+      socket.emit('hello', document.getElementById('inputArea').value)
+    }
+  },
+  created () {
+    // 一定要移除旧的message监听，否则会出现重复监听的状况
+    socket.removeListener('message')
+    // 这是移除所有监听
+    // socket.removeAllListeners()
+    socket.on('message', (data) => {
+      console.log(data)
+    })
   }
 }
 </script>
