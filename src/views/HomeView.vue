@@ -1,48 +1,62 @@
 <template>
   <div class="hello">
-    <input id="inputArea" type="text">
-    <button @click="sendMsgToServer">发送消息给服务端</button>
-  <el-row>
-    <el-button>默认按钮</el-button>
-    <el-button type="primary">主要按钮</el-button>
-    <el-button type="success">成功按钮</el-button>
-    <el-button type="info">信息按钮</el-button>
-    <el-button type="warning">警告按钮</el-button>
-    <el-button type="danger">危险按钮</el-button>
-  </el-row>
+    <el-container>
+      <el-header>Header</el-header>
+      <el-container>
+        <el-aside>Aside</el-aside>
+        <el-container>
+          <el-main>
+            <div id="main" style="height:400px;width:400px;border:1px solid #ccc">123</div>
+          </el-main>
+        </el-container>
+      </el-container>
+    </el-container>
   </div>
 </template>
 
 <script>
-import io from 'socket.io-client'
-const socket = io('http://127.0.0.1:24000')
+import * as echarts from 'echarts'
 export default {
-  name: 'HelloWorld',
+  name: 'HomeView',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: 'Welcome to Your Vue.js App',
+      randomNum: null,
+      randomNumInterval: null
     }
   },
   methods: {
-    /* socket.emit('hello','xxx') 表示，服务端上定义了一个监听'hello'的socket，
-      即服务端有代码
-      socket.on('hello',(data) => {
-        //这是接收到的客户端消息
-        console.log(data)
-      })
-       */
-    sendMsgToServer () {
-      socket.emit('hello', document.getElementById('inputArea').value)
-    }
   },
   created () {
-    // 一定要移除旧的message监听，否则会出现重复监听的状况
-    socket.removeListener('message')
-    // 这是移除所有监听
-    // socket.removeAllListeners()
-    socket.on('message', (data) => {
-      console.log(data)
-    })
+  },
+  mounted () {
+    this.randomNumInterval = setInterval(() => {
+      this.randomNum = Math.random()
+      // 基于准备好的dom，初始化echarts实例
+      const myChart = echarts.init(document.getElementById('main'))
+      // 绘制图表
+      myChart.setOption({
+        title: {
+          text: 'ECharts 入门示例'
+        },
+        tooltip: {},
+        xAxis: {
+          data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+        },
+        yAxis: {},
+        series: [
+          {
+            name: '销量',
+            type: 'bar',
+            data: [this.randomNum * 50, this.randomNum * 20, this.randomNum * 30, this.randomNum * 10, this.randomNum * 10, this.randomNum * 20]
+          }
+        ]
+      })
+    }, 1000)
+  },
+  destroyed () {
+    clearInterval(this.randomNumInterval)
+    this.randomNumInterval = null
   }
 }
 </script>
