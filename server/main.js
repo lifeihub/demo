@@ -1,7 +1,17 @@
 const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
+const path = require('path')
 const app = express();
+// app.use(express.static('../dist'))
+
+// Check settings value
+// 解决server启动client历史路由刷新404问题
+var www = path.resolve(__dirname, "../dist");
+app.use("/", express.static(www));
+app.use("/about", express.static(www));
+
+
 const server = http.createServer(app);
   
 const io = socketIO(server,{
